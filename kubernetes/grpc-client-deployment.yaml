@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-client-deployment
+  namespace: project
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: grpc-client
+  template:
+    metadata:
+      labels:
+        app: grpc-client
+    spec:
+      containers:
+        - name: grpc-client
+          image: dmomotic/grpc-client:latest
+          env:
+            - name: GRPC_SERVER_ADDRESS
+              value: "grpc-server-service.project"
