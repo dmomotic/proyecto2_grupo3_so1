@@ -1,0 +1,41 @@
+{
+  "name": "COVID19_MONITOR",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Grupo3_Sopes1",
+  "license": "MIT",
+  "scripts": {
+    "serve": "live-server public/",
+    "build": "webpack-cli",
+    "dev-server": "webpack-dev-server --host=0.0.0.0 --disable-host-check"
+  },
+  "dependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "1.5.2",
+    "babel-preset-react": "6.24.1",
+    "css-loader": "^3.4.0",
+    "eslint-plugin-react": "^7.17.0",
+    "live-server": "^1.2.1",
+    "node-sass": "^4.14.1",
+    "normalize.css": "^8.0.1",
+    "react": "^16.0.0",
+    "react-dom": "^16.14.0",
+    "react-modal": "^3.11.1",
+    "react-router-dom": "^5.2.0",
+    "recharts": "^1.8.5",
+    "sass-loader": "^8.0.0",
+    "socket.io-client": "^3.0.4",
+    "style-loader": "^1.0.2",
+    "validator": "^12.1.0",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-defaults": "^9.0.0",
+    "webpack": "^4.41.2"
+  }
+}

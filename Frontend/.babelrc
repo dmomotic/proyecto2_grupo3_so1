@@ -1,0 +1,12 @@
+{
+    "presets": [
+        "env",
+        "react"
+    ],
+    "plugins":[
+        //ESTE PLUGIN PERMITE TRANSFORMAR LA SINTAXIS DE LAS PROPIEDADES DE LAS CLASES
+        //POR EJEMPLO YA NO HAY NECESIDAD DE HACER "BIND" CADA VEZ QUE SE 
+        //HACIA UN NUEVO METODO O UTILIZAR UN CONSTRUCTOR EN CADA CLASE
+        "transform-class-properties"
+    ]
+}

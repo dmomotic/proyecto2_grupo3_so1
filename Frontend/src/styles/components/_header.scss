@@ -1,0 +1,32 @@
+.header {
+  background: #000000;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #434343, #000000);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: white;
+    margin-bottom: $m-size;
+    padding: $m-size 0;
+  }
+  
+  .header__title {
+    font-size: $l-size;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .header__subtitle {
+    color: $off-white;
+    font-size: $m-size;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .header__subtitle2 {
+    color: $off-white;
+    font-size: $l-size;
+  }
+  
+  @media (min-width: $desktop-breakpoint) {
+    .header {
+      margin-bottom: $xl-size;
+    }
+  }

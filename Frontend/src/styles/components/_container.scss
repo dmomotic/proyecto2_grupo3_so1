@@ -1,0 +1,19 @@
+.container {
+    max-width: 130rem;
+    margin: 0 auto;
+    padding: 0 $m-size;
+  }
+  
+  .container-inline{
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .container-inline2{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    color: white;
+    font-weight: bold;
+    padding: 0 $l-size;
+  }
