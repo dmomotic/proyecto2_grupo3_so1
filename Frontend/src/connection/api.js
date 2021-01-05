@@ -3,12 +3,12 @@ import socketIOClient from 'socket.io-client';
 
 const ENDPOINT = "http://localhost:4001";
 const cloudEndPoint = "https://websocketserver-bghiq22hva-uc.a.run.app";
-var socket = socketIOClient(ENDPOINT);
+var socket = socketIOClient(cloudEndPoint);
 
 
 
 let connect = (cb) => {
-    socket.connect(ENDPOINT);
+    socket.connect(cloudEndPoint);
 
     socket.on("FromAPI", (data) => {
         cb(data)

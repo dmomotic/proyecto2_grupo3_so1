@@ -13,7 +13,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:8080",
+    origin: "https://proyecto2.g3sopes1.tk",
     methods: ["GET", "POST"]
   }
 });
@@ -46,7 +46,7 @@ const getApiAndEmit = (socket) => {
 
   let r=[];
   let datosmongo=[];
-  MongoClient.connect(url, {
+  MongoClient.connect(url2, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   }, (err, client) => {
@@ -55,14 +55,14 @@ const getApiAndEmit = (socket) => {
     }
   
     // Specify database you want to access
-    //const db = client.db('testdb');
-    //const casos = db.collection('users');
+    const db = client.db('testdb');
+    const casos = db.collection('users');
 
-    const db = client.db('g3sopes1');
-    const casos = db.collection('casos');
+    //const db = client.db('g3sopes1');
+    //const casos = db.collection('casos');
   
   
-    console.log(`MongoDB Connected: ${url}`);
+    console.log(`MongoDB Connected: ${url2}`);
 
     let infofinal= [];
   
