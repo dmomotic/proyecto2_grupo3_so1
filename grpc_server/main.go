@@ -35,7 +35,7 @@ type server struct {
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (s *server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	//JSON string (it comes from client)
 	jsonString := in.GetName()
 	
@@ -61,12 +61,15 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	var req Request	
 	json.Unmarshal([]byte(jsonString), &req)
 
-	//Inserting into Mongodb 
-	insertResult, err := collection.InsertOne(context.TODO(), req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Inserted post with ID:", insertResult.InsertedID)
+	//Checking valid struct
+	if (Request{} != req) {
+		//Inserting into Mongodb 
+		insertResult, err := collection.InsertOne(context.TODO(), req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Inserted post with ID:", insertResult.InsertedID)
+	} 
 
 	//Return something to the client
 	return &pb.HelloReply{Message: "Hello " + jsonString}, nil
