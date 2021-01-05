@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
   if (interval) {
     clearInterval(interval);
   }
-  interval = setInterval(() => getApiAndEmit(socket), 5000);
+  interval = setInterval(() => getApiAndEmit(socket), 8000);
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
@@ -45,7 +45,8 @@ const getApiAndEmit = (socket) => {
   // Emitting a new message. Will be consumed by the client
 
   let r=[];
-  MongoClient.connect(url2, {
+  let datosmongo=[];
+  MongoClient.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   }, (err, client) => {
@@ -54,12 +55,18 @@ const getApiAndEmit = (socket) => {
     }
   
     // Specify database you want to access
-    const db = client.db('testdb');
-    const casos = db.collection('users');
+    //const db = client.db('testdb');
+    //const casos = db.collection('users');
+
+    const db = client.db('g3sopes1');
+    const casos = db.collection('casos');
   
   
-    console.log(`MongoDB Connected: ${url2}`);
+    console.log(`MongoDB Connected: ${url}`);
+
+    let infofinal= [];
   
+
 
     //REPORTE TOP 3 DEPARTAMENTOS
     casos.aggregate([ { $group : { _id : "$location", count: {$sum:1} } },{$sort:{count:-1}},{$limit:3} ] ).toArray((err, results) => {
@@ -70,18 +77,12 @@ const getApiAndEmit = (socket) => {
 
 
     //REPORTE PORCENTAJE DE INFECTADOS POR DEPARTAMENTO
-    /*casos.aggregate([ { $group : { _id : "$location", value: {$sum:1} } },{$sort:{value:-1}}, {$project:{name:"$_id",_id:false, value:"$value"}} ]).toArray((err, results) => {
+    casos.aggregate([ { $group : { _id : "$location", value: {$sum:1} } },{$sort:{value:-1}}, {$project:{name:"$_id",_id:false, value:"$value"}} ]).toArray((err, results) => {
       //console.log(results);
       //r.push(results);
-      socket.emit("FromAPI", results);
-    });*/
+      socket.emit("consulta2", results);
+    });
 
-
-    /*casos.find().toArray((err, results) => {
-      //console.log(results);
-      //r.push(results);
-      socket.emit("FromAPI", results);
-    });*/
   
     //client.close();
   

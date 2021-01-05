@@ -6,16 +6,22 @@ const cloudEndPoint = "https://websocketserver-bghiq22hva-uc.a.run.app";
 var socket = socketIOClient(ENDPOINT);
 
 
+
 let connect = (cb) => {
-    console.log("Attempting Connection...");
-
     socket.connect(ENDPOINT);
-    console.log(socket.connected)
 
-        console.log("WEBSOCKET CONNECTED");
-        socket.on("FromAPI", (data) => {
-            cb(data)
-        });
+    socket.on("FromAPI", (data) => {
+        cb(data)
+    });
+
+};
+
+let consulta2 = (cb) => {
+
+    socket.on("consulta2", (data) => {
+        cb(data)
+    });
+
 };
 
 let adios = () => {
@@ -26,4 +32,4 @@ let adios = () => {
     }
 }
 
-export { connect, adios };
+export { connect, consulta2, adios };

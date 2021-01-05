@@ -1,12 +1,13 @@
 import React from 'react';
-import { connect, adios } from '../connection/api';
+import { connect, consulta2, adios } from '../connection/api';
 import {
   PieChart, Pie, Sector, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#7ffc03','#03fcfc','#fc03be','#6f03fc','#fc0303','#ab4100','#a8252e'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#7ffc03', '#03fcfc', '#fc03be', '#6f03fc', '#fc0303', '#ab4100', '#a8252e'];
+
 const RADIAN = Math.PI / 180;
-/*const renderCustomizedLabel = ({
+const renderCustomizedLabel = ({
   cx, cy, midAngle, innerRadius, outerRadius, percent, index,
 }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -18,42 +19,45 @@ const RADIAN = Math.PI / 180;
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
-};*/
-
-
+};
 
 class Home extends React.Component {
   state = {
     fecha: "",
+    consulta1: [],
     data2: [
       { name: 'Group A', value: 400 },
       { name: 'Group B', value: 300 },
       { name: 'Group C', value: 300 },
       { name: 'Group D', value: 200 },
     ],
-    data:[]
+    data: [],
+
   };
+
 
 
 
   componentDidMount() {
 
     connect((msg) => {
-      console.log("New Message from Server: ");
-      console.log(msg);
       this.setState(prevState => ({
-        data: msg
+        consulta1: msg
       }));
-      console.log(this.state);
     });
-    
+
+    consulta2((consulta2) => {
+      this.setState(prevState => ({
+        data: consulta2
+      }));
+    });
+
+    console.log(this.state);
 
   }
 
   componentWillUnmount() {
-    //const socket= socketIOClient(ENDPOINT);
     adios();
-
   }
 
 
@@ -62,38 +66,61 @@ class Home extends React.Component {
     return (
       <div className="container">
 
-        <h1>Porcentaje de infectados por departamento</h1>
 
-        {/* <PieChart width={400} height={400}>
-        <Tooltip />
-        <Legend  verticalAlign="top" height={36} iconSize={25}/>
-        <Pie
-          data={this.state.data}
-          cx={200}
-          cy={200}
-          labelLine={false}
-          label={renderCustomizedLabel}
-          outerRadius={80}
-          fill="#0088FE"
-          dataKey="value"
-        >
-          {
-            //this.state.data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
-          }
-        </Pie>
-      </PieChart> */}
 
-        <PieChart width={1200} height={400}>
-        <Tooltip />
-        <Legend  verticalAlign="top" height={36} iconSize={25}/>
-          <Pie data={this.state.data} cx="50%" cy="50%" outerRadius={120} label dataKey="value">
-            {
-              this.state.data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index]} />
-              ))
-            }
-          </Pie>
-        </PieChart>
+        <div className="container-inline2">
+
+          <div>
+            <h1 >TOP 3 - Departamentos infectados</h1>
+            <table className="customers">
+              <thead>
+                <tr>
+                  <th>Departamento</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  this.state.consulta1.map((x, i) => {
+                    return (
+                      <tr key={i}>
+                        <td >{x._id}</td>
+                        <td >{x.count}</td>
+                      </tr>
+                    )
+                  })
+                }
+              </tbody>
+            </table>
+
+          </div>
+
+          <div>
+            <h1>Porcentaje de infectados por departamento</h1>
+            <PieChart width={800} height={550}>
+              <Tooltip />
+              <Legend verticalAlign="top" height={36} iconSize={25} />
+              <Pie
+                data={this.state.data}
+                cx="50%"
+                cy="50%"
+                outerRadius={210}
+                labelLine={false}
+                label={renderCustomizedLabel}
+                dataKey="value">
+                {
+                  this.state.data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                  ))
+                }
+              </Pie>
+            </PieChart>
+          </div>
+
+
+        </div>
+
+
 
       </div>
     );
