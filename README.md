@@ -22,7 +22,11 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
         <li><a href="#creación-de-deployments-service-ingresses-y-function-split">Creación de Deployments, Service, Ingresses y Function Split</a></li>
         <li><a href="#inyección-de-los-despliegues">Inyección de los Despliegues</a></li>
       </ul>
+    </li>
+    <li>
       <a href="#blue-deployment">Blue Deployment</a>
+    </li>
+    <li>
       <a href="#green-deployment">Green Deployment</a>
     </li>
   </ol>
@@ -145,7 +149,37 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
   
    * Servicio de redis que está suscrito a un canal y agrega los datos recibido por el mismo a la base de datos de Mongo.
 
- #### Funciones en Go
+ #### Funciones en Go para Redis Sub
  
-   * main: 
-   * :
+ ##### main
+ 
+   * Conecta con la base de datos de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
+   
+     ```
+     c, err := redis.Dial("tcp", "35.188.216.162:6379")
+     ```
+   
+   * Luego utiliza el método redis.PubSubConn de recepción convierte un mensaje enviado en tipos convenientes para usar en un cambio de tipo y lo asigna a una variable. Para suscribirse al canal se utiliza la funcion psc.Subscribe("canal1") dónde 'psc' es la variable a la cual se asignó con PubSubConn.
+     
+     ```
+     psc := redis.PubSubConn{Conn: c}
+     psc.Subscribe("canal1")
+     ```
+     
+   * Se utiliza una sentencia for para verificar si hay mensajes recibidos y en caso de que existan se llama a la función insert_mongo() para instertar los registros a la base de datos de Mongo. Con la función Receive().(type) se obitene el objeto recibido que puede ser un mensaje, suscripción o un error.
+   
+     ```
+     for {
+        switch v := psc.Receive().(type) {
+        case redis.Message:
+          fmt.Printf("%s: message: %s\n", v.Channel, v.Data)
+          insert_mongo(string(v.Data))
+        case redis.Subscription:
+          fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+        case error:
+          fmt.Println(v)
+        }
+      }
+     ```
+     
+ ##### insert_mongo
