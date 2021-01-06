@@ -14,6 +14,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 const (
@@ -22,11 +24,11 @@ const (
 
 //Struct to save into Mongodb
 type Request struct {
-  Name string
-	Location string
-	Age int
+  Name string `redis:"name"`
+	Location string `redis:"location"`
+	Age int `redis:"age"`
 	InfectedType string `json:"infected_type"`
-	State string
+	State string `redis:"state"`
 }
 
 // server is used to implement helloworld.GreeterServer.
@@ -68,7 +70,25 @@ func (s *server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloR
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("Inserted post with ID:", insertResult.InsertedID)
+		fmt.Println("Inserted data in mongo with ID:", insertResult.InsertedID)
+
+		//Inserting into redis
+		c, err := redis.Dial("tcp", "35.188.216.162:6379")
+		if err != nil {
+			log.Println("No se pudo conectar a redis desde GRPC", err)
+		} else {
+			//Getting id counter from redis
+			i, _ := redis.Int(c.Do("GET", "id"))
+			//Adding 1 to the counter
+			redis.Int(c.Do("INCR", "id"))
+			//Id to identify record
+			id := fmt.Sprintf("id%v", i)
+
+			//Inserting object
+			if _, err := c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...); err != nil {
+				fmt.Println("Error insertando objeto en redis desde GRPC: ",err)
+			}
+		}
 	} 
 
 	//Return something to the client
