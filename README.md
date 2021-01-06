@@ -8,31 +8,33 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     <li>
       <a href="#acerca-del-proyecto">Acerca del proyecto</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#tecnologías-utilizadas">Tecnologías Utilizadas</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#comenzando">Comenzando</a>
       <ul>
-        <li><a href="#prerequisitos">Prerequisites</a></li>
+        <li><a href="#pre-requisitos">Pre-requisitos</a></li>
         <li><a href="#creando-el-cluster">Creando el clúster</a></li>
         <li><a href="#instalar-linkerd-en-el-cluster">Instalar Linkerd en el cluster</a></li>
         <li><a href="#creación-de-ingress-nginx">Creación de Ingress Nginx</a></li>
         <li><a href="#inyección-del-ingress-con-linkerd">Inyección del Ingress con Linkerd</a></li>
-        <li><a href="creación-de-deployments,-service,-ingresses-y-function-split">Creación de Deployments, Service, Ingresses y Function Split</a></li>
-        <li><a href="inyección-de-los-despliegues">Inyección de los Despliegues</a></li>
+        <li><a href="#creación-de-deployments-service-ingresses-y-function-split">Creación de Deployments, Service, Ingresses y Function Split</a></li>
+        <li><a href="#inyección-de-los-despliegues">Inyección de los Despliegues</a></li>
       </ul>
+      <a href="#blue-deployment">Blue Deployment</a>
+      <a href="#green-deployment">Green Deployment</a>
     </li>
   </ol>
 </details>
 
 ## Acerca del Proyecto
 
-### Built With
+### Tecnologías Utilizadas
 
-## Getting Started
+## Comenzando
 
-### Prerequisitos
+### Pre-requisitos
 
 1. Tener cuenta en google cloud
 2. Tener instalado gcloud, kubectl, linkerd, helm, locust
@@ -108,9 +110,9 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 #### Ingresses
 
   Se crean los siguientes Ingresses
-  * dummy-ingress:
-  * blue-ingress:
-  * green-ingress:
+  * dummy-ingress: Controlador de ingreso para la API dummy.
+  * blue-ingress: Controlador de ingreso para el cliente de grpc.
+  * green-ingress: Controlador de ingreso para el publish de redis.
   
 #### TrafficSplit
 
@@ -125,3 +127,25 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     | linkerd inject - \
     | kubectl apply -f -
     ```
+    
+ ## Blue Deployment
+ 
+ ## Green Deployment
+ 
+ ### Redis Publish
+  
+   * Servicio de redis que publica a un canal y agrega los datos a la base de datos de Redis.
+   
+ #### Funciones en Go
+ 
+   * main: 
+   * :
+   
+ ### Redis Subscribe
+  
+   * Servicio de redis que está suscrito a un canal y agrega los datos recibido por el mismo a la base de datos de Mongo.
+
+ #### Funciones en Go
+ 
+   * main: 
+   * :
