@@ -51,11 +51,25 @@ func transformAndStore(jsonString string) {
 
 	//Checking valid struct
 	if (Request{} != req) {
+		//It sets the id if its null
+		value, _ := c.Do("GET", "id")
+		if value == nil {
+			c.Do("SET", "id", 1)
+		}
 		//Getting id counter from redis
 		i, _ := redis.Int(c.Do("GET", "id"))
-		//Adding 1 to the counter
-		redis.Int(c.Do("INCR", "id"))
-
+		
+		if i < 5 {
+			//Adding 1 to the counter
+			c.Do("INCR", "id")
+		} else {
+			if i > 5 {
+				i = 1
+			}
+			//Restaring the counter
+			c.Do("SET", "id", 1)
+		}
+		
 		//Id to identify record
 		id := fmt.Sprintf("id%v", i)
 
