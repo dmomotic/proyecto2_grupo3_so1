@@ -151,9 +151,9 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 
  #### Funciones en Go para Redis Sub
  
- ##### main
+ ##### func main()
  
-   * Conecta con la base de datos de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
+   * Conecta con el servidor de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
    
      ```
      c, err := redis.Dial("tcp", "35.188.216.162:6379")
@@ -182,4 +182,32 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
       }
      ```
      
- ##### insert_mongo
+ ##### func insert_mongo(string)
+
+   * Conecta con el servidor de MongoDB con la función newClient() que devuelve el cliente con las funciones necesarias para insertar los registros.
+   
+      ```
+      client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:admin123@cluster0.4d9ky.mongodb.net/testdb?retryWrites=true&w=majority"))
+      ```
+   * Accede a la colección dentro de la base de datos con la función Database().Collection() y devuelve la colección.
+   
+      ```
+      collection := client.Database("testdb").Collection("users")
+      ```
+   * Se crea un struct mediante el string recibido el cual tiene formato json.
+   
+      ```
+      var req Request	
+      json.Unmarshal([]byte(jsonString), &req)
+      ```
+      
+   * Se valida el struct y se inserta a la base de datos mediante la función InsertOne()
+   
+      ```
+      if (Request{} != req) {
+        insertResult, err := collection.InsertOne(context.TODO(), req)
+        if err != nil {
+          log.Fatal(err)
+        }
+      }
+      ```
