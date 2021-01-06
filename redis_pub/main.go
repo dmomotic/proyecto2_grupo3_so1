@@ -1,34 +1,70 @@
 package main
 
 import (
-	"context"
 	"fmt"
-  "github.com/go-redis/redis"
+	"log"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
+
+	"github.com/gorilla/mux"
+	"github.com/gomodule/redigo/redis"
 )
 
-var ctx = context.Background()
+//Base estruct
+type Request struct {
+  Name string `redis:"name"`
+	Location string `redis:"location"`
+	Age int `redis:"age"`
+	InfectedType string `json:"infected_type"`
+	State string `redis:"state"`
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	data := string(reqBody)
+	transformAndStore(data)
+	fmt.Fprintf(w, "%+v", data)
+}
 
 func main() {
-  client := redis.NewClient(&redis.Options{
-		Addr:     "35.188.216.162:6379", // host:port of the redis server
-		Password: "", // no password set
-		DB:       0,  // use default DB
- 	})
+	fmt.Println("Starting redis PUB...")
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", homePage)
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
 
-	pong, err := client.Ping(client.Context()).Result()
-
-	if err !=nil {
-		fmt.Println("err",err);
-	}
-
-	client.Set(ctx, "key", "ojala esto si funcione", 0).Err()
-
-	val, err := client.Get(ctx, "key").Result()
-
+func transformAndStore(jsonString string) {
+	
+	//Connection to redis VPC
+	c, err := redis.Dial("tcp", "35.188.216.162:6379")
 	if err != nil {
-		fmt.Println("err",err);
-		panic(err)
+		log.Println(err)
+	} else {
+		log.Println("Redis PUB connected with Redis Server!!!")
 	}
+	// defer c.Close()
 
-	fmt.Println("key", val)
+	//Parsing JSON string to Struct
+	var req Request	
+	json.Unmarshal([]byte(jsonString), &req)
+
+	//Checking valid struct
+	if (Request{} != req) {
+		//Getting id counter from redis
+		i, _ := redis.Int(c.Do("GET", "id"))
+		//Adding 1 to the counter
+		redis.Int(c.Do("INCR", "id"))
+
+		//Id to identify record
+		id := fmt.Sprintf("id%v", i)
+
+		//Inserting object
+		if _, err := c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...); err != nil {
+			fmt.Println("Error insertando objeto en redis: ",err)
+		}
+	}
+	
+	// This is for Publisher
+	c.Do("PUBLISH", "canal1", jsonString)
 }
