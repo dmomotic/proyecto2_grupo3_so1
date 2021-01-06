@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dummy
+  name: dummy
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummy
+  template:
+    metadata:
+      labels:
+        app: dummy
+    spec:
+      containers:
+      - image: czdev/blue
+        name: dummy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dummy
+  name: dummy
+  namespace: project
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: dummy
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+      grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+  name: dummy-ingress
+  namespace: project
+spec:
+  rules:
+    - host: dummy.so1pro2g3.tk
+      http:
+        paths:
+          - backend:
+              serviceName: dummy
+              servicePort: 8080
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+      grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+    ingress.kubernetes.io/rewrite-target: /
+  name: blue-ingress
+  namespace: project
+spec:
+  rules:
+    - host: blue.so1pro2g3.tk
+      http:
+        paths:
+          - backend:
+              serviceName: grpc-client-service
+              servicePort: 8080
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+      grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+    ingress.kubernetes.io/rewrite-target: /
+  name: green-ingress
+  namespace: project
+spec:
+  rules:
+    - host: green.so1pro2g3.tk
+      http:
+        paths:
+          - backend:
+              serviceName: redis-pub-service
+              servicePort: 8080
+---
+apiVersion: split.smi-spec.io/v1alpha1
+kind: TrafficSplit
+metadata:
+  name: function-split
+  namespace: project
+spec:
+  service: dummy
+  backends:
+  - service: grpc-client-service
+    weight: 500m
+  - service: redis-pub-service
+    weight: 500m
