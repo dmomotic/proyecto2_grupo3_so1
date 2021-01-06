@@ -25,9 +25,17 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     </li>
     <li>
       <a href="#blue-deployment">Blue Deployment</a>
+      <ul>
+        <li><a href="#grpc-client">Grpc Client</a></li>
+        <li><a href="#grpc-server">Grpc Server</a></li>
+      </ul>
     </li>
     <li>
       <a href="#green-deployment">Green Deployment</a>
+      <ul>
+        <li><a href="#redis-publish">Redis Publish</a></li>
+        <li><a href="#redis-subscribe">Redis Subscribe</a></li>
+      </ul>
     </li>
   </ol>
 </details>
@@ -134,16 +142,84 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     
  ## Blue Deployment
  
+ ### Grpc Client
+ 
+ #### Funciones en Go para Grpc Client
+ 
+ ### Grpc Server
+ 
+ #### Funciones en Go para Grpc Server
+ 
  ## Green Deployment
  
  ### Redis Publish
   
    * Servicio de redis que publica a un canal y agrega los datos a la base de datos de Redis.
    
- #### Funciones en Go
+ #### Funciones en Go para Redis Pub
  
-   * main: 
-   * :
+ ##### func homePage(http.ResponseWriter,* http.Request)
+ 
+   * Esta función es llamada al inicio por el manejador de mux para recibir una petición. ReadAll() obtiene el cuerpo del request, este se almacena como string en data y se envía a la función transformAndStore().
+   
+     ```
+     reqBody, _ := ioutil.ReadAll(r.Body)
+     data := string(reqBody)
+     transformAndStore(data)
+     ```
+ 
+ ##### func transformAndStore(string)
+ 
+   * Conecta con el servidor de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
+   
+     ```
+     c, err := redis.Dial("tcp", "35.188.216.162:6379")
+     ```
+   
+   * Se crea un struct mediante el string recibido el cual tiene formato json.
+   
+     ```
+     var req Request	
+     json.Unmarshal([]byte(jsonString), &req)
+     ```
+      
+   * Si el struct no está vacío se asigna el id con la funcion Do() que recibe la acción a realizar y el id.
+   
+     ```
+     value, _ := c.Do("GET", "id")
+     ```
+   
+   * Se obtiene un contador desde redis con la función Int()
+   
+     ```
+     i, _ := redis.Int(c.Do("GET", "id"))
+     ```
+     
+   * Para que solo se almacenen 5 registros en la base de datos de Redis se hace la siguiente condición, si i es mayor a 5 se agrega 1 al contador, en caso contrario se reinicia el contador.
+     ```
+     if i < 5 {
+			c.Do("INCR", "id")
+		 } else {
+			if i > 5 {
+				i = 1
+			}
+			c.Do("SET", "id", 1)
+		 }
+     ```
+     
+   * Para insertar en la base de datos se utiliza la función Do() con la acción "HMSET" para que se almacene con un tipo de estructura Map. Add() agrega el identificador y AddFlat() agrega el struct que contiene el registro.
+     ```
+     c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...);
+     ```
+ 
+ ##### func main()
+ 
+   * En esta función se crea el router con la función NewRouter().StrictSlash(true) y se lanza el manejador con la función HandleFunc() que recibe la dirección y la función a ejecutar.
+   
+     ```
+     router := mux.NewRouter().StrictSlash(true)
+	   router.HandleFunc("/", homePage)
+     ```
    
  ### Redis Subscribe
   
@@ -186,28 +262,25 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 
    * Conecta con el servidor de MongoDB con la función newClient() que devuelve el cliente con las funciones necesarias para insertar los registros.
    
-      ```
-      client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:admin123@cluster0.4d9ky.mongodb.net/testdb?retryWrites=true&w=majority"))
-      ```
+     ```
+     client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:admin123@cluster0.4d9ky.mongodb.net/testdb?retryWrites=true&w=majority"))
+     ```
+   
    * Accede a la colección dentro de la base de datos con la función Database().Collection() y devuelve la colección.
    
-      ```
-      collection := client.Database("testdb").Collection("users")
-      ```
+     ```
+     collection := client.Database("testdb").Collection("users")
+     ```
+   
    * Se crea un struct mediante el string recibido el cual tiene formato json.
    
-      ```
-      var req Request	
-      json.Unmarshal([]byte(jsonString), &req)
-      ```
+     ```
+     var req Request	
+     json.Unmarshal([]byte(jsonString), &req)
+     ```
       
-   * Se valida el struct y se inserta a la base de datos mediante la función InsertOne()
+   * Si el struct no está vacío se inserta a la base de datos mediante la función InsertOne()
    
-      ```
-      if (Request{} != req) {
-        insertResult, err := collection.InsertOne(context.TODO(), req)
-        if err != nil {
-          log.Fatal(err)
-        }
-      }
-      ```
+     ```
+     insertResult, err := collection.InsertOne(context.TODO(), req)
+     ```
