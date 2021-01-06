@@ -37,21 +37,28 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
         <li><a href="#redis-subscribe">Redis Subscribe</a></li>
       </ul>
     </li>
+    <li>
+      <a href="#generación-de-tráfico-con-locust">Generación de tráfico con Locust</a>
+      <ul>
+        <li><a href="#archivo-json-de-datos">Archivo JSON de datos</a></li>
+        <li><a href="#funciones-en-python-para-locust">Funciones en python para Locust</a></li>
+      </ul>
+    </li>  
   </ol>
 </details>
 
-## Acerca del Proyecto
+ # Acerca del Proyecto
 
-### Tecnologías Utilizadas
+ ## Tecnologías Utilizadas
 
-## Comenzando
+ # Comenzando
 
-### Pre-requisitos
+ ## Pre-requisitos
 
 1. Tener cuenta en google cloud
 2. Tener instalado gcloud, kubectl, linkerd, helm, locust
 
-### Creando el Cluster
+ ## Creando el Cluster
   * Iniciar GCloud
     ```
     gcloud init
@@ -61,12 +68,12 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     gcloud container clusters create k8s-demo --num-nodes=1 --tags=allin,allout --enable-legacy-authorization --enable-basic-auth --issue-client-certificate --machine-type=n1-standard-2 --no-enable-network-policy
     ```
   
-### Instalar linkerd en el cluster
+ ## Instalar linkerd en el cluster
   ```
   linkerd install | kubectl apply -f -
   ```
   
-### Creación de Ingress Nginx
+ ## Creación de Ingress Nginx
 
   * Crear namespace para ingress
     ```
@@ -83,25 +90,25 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     helm install nginx-ingress ingress-nginx/ingress-nginx -n nginx-ingress
     ```
     
-### Inyección del Ingress con Linkerd
+ ## Inyección del Ingress con Linkerd
 
   * Inyectar los pods al ingress para linkerd
     ```
     kubectl get deployment nginx-ingress-ingress-nginx-controller -n nginx-ingress -o yaml | linkerd inject --ingress - | kubectl apply -f -
     ```
     
- ### Creación de Deployments, Service, Ingresses y Function Split
+ ## Creación de Deployments, Service, Ingresses y Function Split
  
   * Para ello se utiliza el siguiente comando con cada archivo .yaml o se puede utilizar una archivo .yaml que contenga todas las configuraciones.
     ```
     kubectl create -f [file.yaml]
     ```
     
- #### Namespace
+ ### Namespace
   
   Se crea el namespace 'project' en el cual se agrupan las configuraciones.
   
- #### Deployments
+ ### Deployments
  
   Se crean los siguentes despliegues:
   * dummy: Despliegue de la API dummy la cual funciona como punto de division del tráfico.
@@ -110,7 +117,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
   * redis-pub-deployment: Despliegue green del publish para redis.
   * redis-sub-deployment: Despliegue para el subscribe de redis.
   
-#### Services
+### Services
 
   Se crean los siguientes servicios:
   * dummy: Servicio de la API dummy de división de tráfico.
@@ -119,18 +126,18 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
   * redis-pub-service: Servicio del despliegue green del publish para redis.
   * redis-sub-service: Servicio para el subscrib de redis.
   
-#### Ingresses
+### Ingresses
 
   Se crean los siguientes Ingresses
   * dummy-ingress: Controlador de ingreso para la API dummy.
   * blue-ingress: Controlador de ingreso para el cliente de grpc.
   * green-ingress: Controlador de ingreso para el publish de redis.
   
-#### TrafficSplit
+### TrafficSplit
 
   * function-split: Función para el servicio dummy que divide el tráfico hacia los despliegues blue y green.
   
-### Inyección de los Despliegues
+## Inyección de los Despliegues
 
   * Se deben inyectar los despliegues lo cual permite que cada uno tenga 2 pods.
 
@@ -140,25 +147,25 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
     | kubectl apply -f -
     ```
     
- ## Blue Deployment
+ # Blue Deployment
  
- ### Grpc Client
+ ## Grpc Client
  
- #### Funciones en Go para Grpc Client
+ ### Funciones en Go para Grpc Client
  
- ### Grpc Server
+ ## Grpc Server
  
- #### Funciones en Go para Grpc Server
+ ### Funciones en Go para Grpc Server
  
- ## Green Deployment
+ # Green Deployment
  
- ### Redis Publish
+ ## Redis Publish
   
    * Servicio de redis que publica a un canal y agrega los datos a la base de datos de Redis.
    
- #### Funciones en Go para Redis Pub
+ ### Funciones en Go para Redis Pub
  
- ##### func homePage(http.ResponseWriter,* http.Request)
+ #### func homePage(http.ResponseWriter,* http.Request)
  
    * Esta función es llamada al inicio por el manejador de mux para recibir una petición. ReadAll() obtiene el cuerpo del request, este se almacena como string en data y se envía a la función transformAndStore().
    
@@ -168,7 +175,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
      transformAndStore(data)
      ```
  
- ##### func transformAndStore(string)
+ #### func transformAndStore(string)
  
    * Conecta con el servidor de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
    
@@ -212,7 +219,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
      c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...);
      ```
  
- ##### func main()
+ #### func main()
  
    * En esta función se crea el router con la función NewRouter().StrictSlash(true) y se lanza el manejador con la función HandleFunc() que recibe la dirección y la función a ejecutar.
    
@@ -221,13 +228,13 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 	   router.HandleFunc("/", homePage)
      ```
    
- ### Redis Subscribe
+ ## Redis Subscribe
   
    * Servicio de redis que está suscrito a un canal y agrega los datos recibido por el mismo a la base de datos de Mongo.
 
- #### Funciones en Go para Redis Sub
+ ### Funciones en Go para Redis Sub
  
- ##### func main()
+ #### func main()
  
    * Conecta con el servidor de Redis con la función redis.Dial() que recibe el tipo de red y la dirección en la cual se encuentra alojado Redis. 
    
@@ -258,7 +265,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
       }
      ```
      
- ##### func insert_mongo(string)
+ #### func insert_mongo(string)
 
    * Conecta con el servidor de MongoDB con la función newClient() que devuelve el cliente con las funciones necesarias para insertar los registros.
    
@@ -284,3 +291,37 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
      ```
      insertResult, err := collection.InsertOne(context.TODO(), req)
      ```
+ # Generación de tráfico con Locust
+ 
+ ### Archivo JSON de datos
+ 
+   * El archivo con formato json contiene un conjunto de registros formado por los siguientes atributos:
+     
+     ```
+     {
+        "name": "Duglas Francisco Avila Torres",
+        "location": "Chimaltenango",
+        "age": 19,
+        "infected_type": "imported",
+        "state": "deceased"
+     }
+     ```
+ ### Archivo de aplicacion de Locust
+   
+   * Este es un archivo de pytho que contiene el codigo utilizado por locust para ejecutar solicitudes ya sea de tipo GET o POST. Dentro de la clase QuickstartUser se encuentra delay y la función que ejecuta la soliciutdes.
+ 
+ #### funcion on_start
+   
+   * En esta función se envían las solicitudes de tipo POST. Lo primero que hace es abrir el archivo json con la función open(), luego se carga los datos a una variable en este caso 'data' y elege un registro del array de forma aleatoria utilizando la función randint() para elegir una posición. Por último se envía el registro json con la función self.client.post() a la dirección que corresponde. 
+ 
+    ```
+    @task
+    def on_start(self):
+    	reg = ""
+        with open('traffic.json') as file:
+        	data = json.load(file)
+                value = randint(0, 51)
+                reg = data[value]
+
+        self.client.post("/", json=reg)
+    ```
