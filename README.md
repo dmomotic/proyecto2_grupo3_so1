@@ -48,8 +48,21 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 </details>
 
  # Acerca del Proyecto
+ 
+ Este proyecto consiste en una arquitectura de sistema distribuida genérica que muestre estadísticas en tiempo real mediante Kubernetes y tecnologías nativas en la nube. Y proporcionar un despliegue blue/green, Canary o división de tráfico. Este proyecto se aplicará a los casos infectados actuales de COVID-19.
 
  ## Tecnologías Utilizadas
+  
+  * Kubernetes
+  * Golang
+  * Python
+  * Locust
+  * Linkerd
+  * React
+  * JavaScript
+  * Redis
+  * Grpc
+  * MongoDB
 
  # Comenzando
 
