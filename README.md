@@ -207,6 +207,70 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
  ## Grpc Server
  
  ### Funciones en Go para Grpc Server
+
+ #### func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error)
+ 
+   * Esta es la función que los clientes ejecutan a través gRPC client, donde obtenemos la información enviada por los clientes gracias al parametro in en su método GetName().
+   
+     ```
+	   jsonString := in.GetName()
+     ```
+    
+   * Hacemos uso de la libreria de mongo **go.mongodb.org/mongo-driver/mongo** para poder conectarnos al servidor de mongo que fue creado con la herramienta Mongo Atlas.
+     
+     ```
+	   client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:admin123@cluster0.4d9ky.mongodb.net/testdb?retryWrites=true&w=majority"))
+     ```
+     
+   * Una vez conectados con Mongo debemos acceder a la base de de datos y a la collection deseada.
+     
+     ```
+	   collection := client.Database("testdb").Collection("users")
+     ```
+    
+   * Convertimos el string a un struct de Golang.
+     
+     ```
+	   var req Request	
+	   json.Unmarshal([]byte(jsonString), &req)
+     ```
+
+   * Y realizamos la inserción de la información de mongo.
+     
+     ```
+	   insertResult, err := collection.InsertOne(context.TODO(), req)
+     ```
+     
+   * Como debemo tambien almancenar la información de redis, realizamos la conexión hacia nuestro servidor de redis con la ayuda de la libreria **github.com/gomodule/redigo/redis** 
+     
+     ```
+	   c, err := redis.Dial("tcp", "35.188.216.162:6379")
+     ```
+
+   * Finalmente se realiza la inserción de la data en redis, con validación de errores
+     
+     ```
+	   if _, err := c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...); err != nil {
+			 fmt.Println("Error insertando objeto en redis desde GRPC: ",err)
+		 }
+     ```
+
+ #### func main()   
+     
+   * La función main es la escarga de inicializar el servidor de gRPC
+     
+     ```
+	   lis, err := net.Listen("tcp", port)
+     if err != nil {
+       log.Fatalf("failed to listen: %v", err)
+     }
+     s := grpc.NewServer()
+     pb.RegisterGreeterServer(s, &server{})
+     if err := s.Serve(lis); err != nil {
+       log.Fatalf("failed to serve: %v", err)
+     }
+     ```
+     
  
  # Green Deployment
  
