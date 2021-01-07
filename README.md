@@ -43,7 +43,14 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
         <li><a href="#archivo-json-de-datos">Archivo JSON de datos</a></li>
         <li><a href="#archivo-de-aplicación-para-locust">Archivo de aplicación para Locust</a></li>
       </ul>
-    </li>  
+    </li>
+    <li>
+      <a href="#Cloud-Run">Cloud Run - Frontend y Servidor</a>
+      <ul>
+        <li><a href="#archivo-json-de-datos">Archivo JSON de datos</a></li>
+        <li><a href="#archivo-de-aplicación-para-locust">Archivo de aplicación para Locust</a></li>
+      </ul>
+    </li>  	
   </ol>
 </details>
 
@@ -453,3 +460,4 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 
         self.client.post("/", json=reg)
     ```
+# Cloud Run
