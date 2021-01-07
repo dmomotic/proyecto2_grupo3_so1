@@ -77,32 +77,9 @@ func (s *server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloR
 		if err != nil {
 			log.Println("No se pudo conectar a redis desde GRPC", err)
 		} else {
-			//It sets the id if its null
-			value, _ := c.Do("GET", "id")
-			if value == nil {
-				c.Do("SET", "id", 1)
-			}
-
-			//Getting id counter from redis
-			i, _ := redis.Int(c.Do("GET", "id"))
-
-			if i < 5 {
-				//Adding 1 to the counter
-				c.Do("INCR", "id")
-			} else {
-				if i > 5 {
-					i = 1
-				}
-				//Restaring the counter
-				c.Do("SET", "id", 1)
-			}
-
-			//Id to identify record
-			id := fmt.Sprintf("id%v", i)
-
 			//Inserting object
-			if _, err := c.Do("HMSET", redis.Args{}.Add(id).AddFlat(&req)...); err != nil {
-				fmt.Println("Error insertando objeto en redis desde GRPC: ",err)
+			if _, err := c.Do("LPUSH", "lista", jsonString); err != nil {
+				fmt.Println("Error insertando objeto en redis: ",err)
 			}
 		}
 	} 
