@@ -41,7 +41,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
       <a href="#generación-de-tráfico-con-locust">Generación de tráfico con Locust</a>
       <ul>
         <li><a href="#archivo-json-de-datos">Archivo JSON de datos</a></li>
-        <li><a href="#funciones-en-python-para-locust">Funciones en python para Locust</a></li>
+        <li><a href="#archivo-de-aplicación-para-locust">Archivo de aplicación para Locust</a></li>
       </ul>
     </li>  
   </ol>
@@ -153,6 +153,57 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
  
  ### Funciones en Go para Grpc Client
  
+ #### func homePage(http.ResponseWriter,* http.Request)
+ 
+   * Esta función es llamada al inicio por el manejador de mux para recibir una petición. ReadAll() obtiene el cuerpo del request, este se almacena como string en data y se envía a la función connect_with_grpc_server().
+   
+     ```
+     reqBody, _ := ioutil.ReadAll(r.Body)
+     data := string(reqBody)
+     connect_with_grpc_server(data)
+     ```
+ #### func connect_with_grpc_server(string)
+ 
+   * Primero se obtiene la dirección del servidor de grpc.
+   
+     ```
+     address := fmt.Sprintf("%s:8081", os.Getenv("GRPC_SERVER_ADDRESS"))
+     ```
+   
+   * Se realiza la conexión utilizando la función Dial() utilizando la dirección del servidor de grpc.
+   
+     ```
+     conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+     ```
+   
+   * Se crea un nuevo cliente utilizando la función NewGreeterClient() con la conexión que se acaba de crear como parámetro.
+   
+     ```
+     c := pb.NewGreeterClient(conn)
+     ```
+     
+   * La funcion WithTimeout() se utiliza para cancelar la ejecución cuando la operación existente se haya completado.
+     
+     ```
+     ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+     ```
+     
+   * Por ultimo se hace la llamada a la función SayHello() la cual se encuentra en el servidor de grpc.
+     
+     ```
+     r, err := c.SayHello(ctx, &pb.HelloRequest{Name: name})
+     ```
+     
+  #### func main()
+ 
+   * En esta función se crea el router con la función NewRouter().StrictSlash(true) y se lanza el manejador con la función HandleFunc() que recibe la dirección y la función a ejecutar. Por ultimo con la función ListenAndServe se permite al router escuchar en el puerto elegido.
+   
+     ```
+     router := mux.NewRouter().StrictSlash(true)
+     router.HandleFunc("/", homePage)
+     log.Fatal(http.ListenAndServe(":8080", router))
+     ```
+ 
  ## Grpc Server
  
  ### Funciones en Go para Grpc Server
@@ -186,7 +237,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
    * Se crea un struct mediante el string recibido el cual tiene formato json.
    
      ```
-     var req Request	
+     var req Request
      json.Unmarshal([]byte(jsonString), &req)
      ```
       
@@ -306,7 +357,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
         "state": "deceased"
      }
      ```
- ### Archivo de aplicacion de Locust
+ ### Archivo de aplicación para Locust
    
    * Este es un archivo de pytho que contiene el codigo utilizado por locust para ejecutar solicitudes ya sea de tipo GET o POST. Dentro de la clase QuickstartUser se encuentra delay y la función que ejecuta la soliciutdes.
  
