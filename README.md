@@ -43,13 +43,33 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
         <li><a href="#archivo-json-de-datos">Archivo JSON de datos</a></li>
         <li><a href="#archivo-de-aplicación-para-locust">Archivo de aplicación para Locust</a></li>
       </ul>
-    </li>  
+    </li>
+    <li>
+      <a href="#Cloud-Run">Cloud Run - Frontend y Servidor</a>
+      <ul>
+        <li><a href="#Frontend">Frontend</a></li>
+        <li><a href="#Servidor">NodeJs (Websockets)</a></li>
+      </ul>
+    </li>  	
   </ol>
 </details>
 
  # Acerca del Proyecto
+ 
+ Este proyecto consiste en una arquitectura de sistema distribuida genérica que muestre estadísticas en tiempo real mediante Kubernetes y tecnologías nativas en la nube. Y proporcionar un despliegue blue/green, Canary o división de tráfico. Este proyecto se aplicará a los casos infectados actuales de COVID-19.
 
  ## Tecnologías Utilizadas
+  
+  * Kubernetes
+  * Golang
+  * Python
+  * Locust
+  * Linkerd
+  * React
+  * JavaScript
+  * Redis
+  * Grpc
+  * MongoDB
 
  # Comenzando
 
@@ -440,3 +460,23 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 
         self.client.post("/", json=reg)
     ```
+# Cloud Run
+La aplicación de React estara en un contenedor para desplegar en Cloud Run, el servidor Websockets tambien estara desplegado en Cloud Run.
+
+### Frontend
+* A continuacion se muestra el archivo Docker con el cual se construira la imagen, utilizando el comando "docker build --rm -t reactimage ."
+
+```
+     FROM node:latest
+     COPY . .
+     RUN npm install
+     CMD ["npm", "run", "dev-server"]
+   ```
+* (Opcional) Se puede probar la imagen para ver que realmente funcione, con el comando "docker run -it --rm -p 8080:8080 reactimage"
+* Ahora vamos a publicar la imagen para que se sirva desde la nube de Google
+
+```
+docker tag <IMAGE_ID> gcr.io/g3sopes1/reactimage:v.0.1
+   ```
+* El <IMAGE_ID> es el ID que se obtiene con el comando "docker images"
+
