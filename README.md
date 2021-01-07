@@ -479,4 +479,38 @@ La aplicación de React estara en un contenedor para desplegar en Cloud Run, el 
 docker tag <IMAGE_ID> gcr.io/g3sopes1/reactimage:v.0.1
    ```
 * El <IMAGE_ID> es el ID que se obtiene con el comando "docker images"
+* La imagén ya tiene un nuevo TAG y podemos subirla a la nube de Google
+
+```
+docker push gcr.io/g3sopes1/reactimage
+   ```
+* Si nos vamos a GCP, podremos ver la imagen en "Container Registry"
+* Ahora en "Cloud Run" seguiremos los siguientes pasos:
+1. Crear servicio.
+2. Damos clic en "Configurar la primera revisión del servicio" y elegimos la imagen que ya subimos.
+3. Vamos a "Opciones avanzadas" y en número maximo de instancias seleccionamos 3.
+4. Permitimos todo el tráfico y luego seleccionamos "Permitir invocaciones sin autenticación". 
+5. Creamos el servicio.
+
+* Por ultimo veremos la dirección donde esta activo el servicio. 
+## Mapear servicio con dominio personalizado
+
+
+### Servidor
+* A continuacion se muestra el archivo Docker con el cual se construira la imagen, utilizando el comando "docker build --rm -t nodejsimage ."
+
+```
+     FROM node:12
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 4001
+
+CMD [ "node","app.js" ]
+   ```
 
