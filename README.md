@@ -257,10 +257,10 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 
  #### func main()   
      
-   * La función main es la escarga de inicializar el servidor de gRPC
+   * La función main es la encargada de inicializar el servidor de gRPC
      
      ```
-	   lis, err := net.Listen("tcp", port)
+     lis, err := net.Listen("tcp", port)
      if err != nil {
        log.Fatalf("failed to listen: %v", err)
      }
