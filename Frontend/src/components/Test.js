@@ -1,5 +1,4 @@
 import React from 'react';
-
 import axios from 'axios';
 
 class Test extends React.Component {
@@ -8,6 +7,13 @@ class Test extends React.Component {
   };
 
   componentDidMount() {
+    this.getCasos();
+    this.interval = setInterval(() => {
+      this.getCasos();
+    }, 5000);
+  }
+
+  getCasos(){
     axios.get(`https://us-central1-g3sopes1.cloudfunctions.net/redisFunc`)
       .then(res => {
         const id1 = res.data;
@@ -18,10 +24,11 @@ class Test extends React.Component {
       })
     console.log("STATE");
     console.log(this.state);
+
   }
 
   componentWillUnmount() {
-
+    clearInterval(this.interval);
   }
 
 
