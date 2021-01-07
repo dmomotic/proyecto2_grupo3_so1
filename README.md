@@ -463,7 +463,7 @@ Repositorio proyecto 2 del curso Sistemas Operativos 1 - USAC
 # Cloud Run
 La aplicación de React estara en un contenedor para desplegar en Cloud Run, el servidor Websockets tambien estara desplegado en Cloud Run.
 
-### Frontend
+## Frontend
 * A continuacion se muestra el archivo Docker con el cual se construira la imagen, utilizando el comando "docker build --rm -t reactimage ."
 
 ```
@@ -493,10 +493,18 @@ docker push gcr.io/g3sopes1/reactimage
 5. Creamos el servicio.
 
 * Por ultimo veremos la dirección donde esta activo el servicio. 
-## Mapear servicio con dominio personalizado
+### Mapear servicio con dominio personalizado
+Para poder mapear el servicio debemos contar con un dominio propio, en este caso es "g3sopes1.tk".
+
+* En la pestaña de "Cloud Run" seleccionaremos en "MANAGE CUSTOMS DOMAINS".
+* Daremos clic en "ADD MAPPING".
+* Seleccionamos el servicio que queremos mapear y luego ingresamos nuestro dominio. 
+* Para poder verificar que el dominio nos pertenece, debemos agregar un registro TXT en Cloud DNS
+* Una vez que el dominio este verificado, ingresaremos un subdominio, en nuestro caso "proyecto2".
+* Por ultimo podremos ver el mapeo en https://proyecto2.g3sopes1.tk
 
 
-### Servidor
+## Servidor
 * A continuacion se muestra el archivo Docker con el cual se construira la imagen, utilizando el comando "docker build --rm -t nodejsimage ."
 
 ```
@@ -513,4 +521,4 @@ EXPOSE 4001
 
 CMD [ "node","app.js" ]
    ```
-
+* Para poder subir el servidor a Cloud debemos seguir los mismos pasos que para el ###Frontend y Listo!
