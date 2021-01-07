@@ -10,7 +10,7 @@ const AppRouter=()=>(
     <Header title='G3-COVID19-Monitor'></Header>
       <Switch>
       <Route path="/" component={Home} exact={true}/>
-      <Route path="/prueba" component={Test}/>
+      <Route path="/redis" component={Test}/>
       </Switch> 
     </div>
     </BrowserRouter>
