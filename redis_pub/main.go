@@ -50,8 +50,16 @@ func transformAndStore(jsonString string) {
 
 	//Checking valid struct
 	if (Request{} != req) {
+
+		//Struct to jsonstring just to ensure a good format
+		b, err := json.Marshal(req)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 		//Inserting object
-		if _, err := c.Do("LPUSH", "lista", jsonString); err != nil {
+		if _, err := c.Do("LPUSH", "lista", string(b)); err != nil {
 			fmt.Println("Error insertando objeto en redis: ",err)
 		}
 	}

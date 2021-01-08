@@ -77,8 +77,14 @@ func (s *server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloR
 		if err != nil {
 			log.Println("No se pudo conectar a redis desde GRPC", err)
 		} else {
+			//Struct to jsonstring just to ensure a good format
+			b, err := json.Marshal(req)
+			if err != nil {
+				fmt.Println(err)
+			}
+
 			//Inserting object
-			if _, err := c.Do("LPUSH", "lista", jsonString); err != nil {
+			if _, err := c.Do("LPUSH", "lista", string(b)); err != nil {
 				fmt.Println("Error insertando objeto en redis: ",err)
 			}
 		}
